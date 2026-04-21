@@ -1,0 +1,31 @@
+@keyframes player_created {
+    from{ transform: scale(0); opacity: 0;}
+    to{transform: scale(1); opacity: 1;}
+}
+
+.player
+{
+    animation-name: player_created;
+    animation-duration: 0.5s;
+
+    position: fixed;
+    width: 25px;
+    height: 25px;
+
+
+    transition-duration: 0.45s;
+    transition-timing-function: linear;
+}
+
+.current_player
+{
+    transition-duration: 0s !important;
+}
+
+.player > p{
+    position: relative;
+    bottom: 35px;
+    width: 900%;
+    left: -400%;
+    text-align: center;
+}

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marauder's Map Game</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <script src="./utils.js"></script>
+    <script src="./input.js"></script>
+    <script src="./player_system/packets.js"></script>
+    <script src="./player_system/data.js"></script>
+    <script src="./player_system/game.js"></script>
+    <script src="./client.js"></script>
+    <script src="./server.js"></script>
+
+    <input id="username_input" placeholder="Username">
+    <button onclick="CreatePlayer()">Join</button>
+    <button onclick="PlayerLeave();ClearGame();">Leave</button>
+    <p id="player_display">
+
+    </p>
+</body>
+</html>
