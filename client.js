@@ -44,7 +44,7 @@ const CAMERA_MOVEMENT_PADDING = 100
 function PlayRandomWaltz()
 {
     const randomPiece = new Audio(MUSIC[Math.floor(Math.random() * MUSIC.length)]);
-    randomPiece.volume = 0.33;
+    randomPiece.volume = 0.66;
 
     //Don't play the same thing twice.
     if(CurrentMusic != null && randomPiece.src == CurrentMusic.src){
