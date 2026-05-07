@@ -142,6 +142,15 @@ function _validateUsername(username)
     return username.match(regex) == username;
 }
 
+const RANDOM_SPAWNS = [
+    { x: 622, y: 400 },
+    { x: 64, y: 709 },
+    { x: 2511, y: 621 },
+    { x: 1701, y: 284 },
+    { x: 646, y: 704 },
+    { x: 515, y: 1055 }
+]
+
 /**
  * Creates a new player object and adds it to the specificed lobby. Returns a promise for the new player object (or null if the player cannot be created).
  * Also sets the current player to the created player. Must be called before any packets can send or recieve.
@@ -179,6 +188,9 @@ async function PlayerJoin(username, lobbyID)
 
     //Set current player for tracking.
     _currentPlayer = player;
+
+    const spawnPoint = RANDOM_SPAWNS[Math.floor(Math.random() * RANDOM_SPAWNS.length)];
+    player.Position = spawnPoint;
 
     return { value: true, player: player };
 }

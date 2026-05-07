@@ -15,12 +15,15 @@
     <script src="./player_system/game.js"></script>
     <script src="./client.js"></script>
     <script src="./server.js"></script>
+    <script src="./map_manager.js"></script>
 
-    <input id="username_input" placeholder="Username">
-    <button onclick="CreatePlayer()">Join</button>
-    <button onclick="PlayerLeave();ClearGame();">Leave</button>
-    <p id="player_display">
+    <input id="username_input" placeholder="Username" style="z-index: 10; position: relative;">
+    <button onclick="CreatePlayer(); if(CurrentMusic == null){PlayRandomWaltz();};" style="z-index: 10; position: relative;">Join</button>
+    <button onclick="PlayerLeave();ClearGame();" style="z-index: 10; position: relative;">Leave</button>
+    <p style="z-index: 10; position: relative;" id="player_display">
 
     </p>
+
+    <div id="object_holder" style="width: 6000%;height: 400%;transform: translateY(-75%); position: absolute;top: 0px;left: 0px;"></div>
 </body>
 </html>

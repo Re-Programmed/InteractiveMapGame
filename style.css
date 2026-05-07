@@ -9,17 +9,42 @@
     animation-duration: 0.5s;
 
     position: fixed;
-    width: 25px;
-    height: 25px;
+    width: 100px;
+    height: 100px;
 
 
     transition-duration: 0.45s;
     transition-timing-function: linear;
 }
 
+.player_hair
+{
+    position: fixed;
+    width: 100px;
+    height: 100px;
+    background-image: url('./assets/player_hair.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+
+    transform: translate(0, -115px);
+}
+
+#player_display
+{
+    color: #8888ff;
+    font-family: 'Times New Roman', Times, serif;
+    display: inline;
+}
+
 .current_player
 {
     transition-duration: 0s !important;
+
+    background-image: url('./assets/player.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .player > p{
@@ -28,4 +53,66 @@
     width: 900%;
     left: -400%;
     text-align: center;
+}
+
+@keyframes fade_footstep {
+    0% {opacity: 0;}
+    50%{opacity: 1;}
+    100%{opacity: 0;}
+}
+
+.footstep_particle
+{
+    animation-name: fade_footstep;
+    animation-duration: 1s;
+    animation-fill-mode: both;
+    
+    position: fixed;
+    width: 48px;
+    height: 48px;
+}
+
+.name_banner
+{
+    background-image: url('./assets/name_banner.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+
+    width: 200px;
+    height: 96px;
+
+    translate: -57px -50px;
+
+    transition-duration: 0.5s;
+}
+
+.name_banner > p
+{
+    text-align: center;
+    padding-top: 20px;
+    padding-left: 17px;
+}
+
+.lamp_post, .door, .interactable
+{
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+
+    width: 100px;
+
+    transition-duration: 0.25s;
+}
+
+#object_holder
+{
+    transition-duration: 0.5s;
+    overflow: hidden;
+}
+
+body
+{
+    overflow: hidden;
+    
+    background-color: #C5A872;
 }

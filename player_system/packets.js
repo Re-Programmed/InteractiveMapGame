@@ -60,7 +60,8 @@ class Lobby extends IDObject
 
 const PACKET_TYPES = {
     PLAYER_UPDATE: "PLAYER_UPDATE", //Has no data and is passed no matter what.
-    PLAYER_COLOR_FLASH: "PLAYER_COLOR_FLASH"
+    PLAYER_COLOR_FLASH: "PLAYER_COLOR_FLASH",
+    PLAYER_INTERACTION: "PLAYER_INTERACTION"
 }
 
 class Packet
@@ -73,6 +74,12 @@ class Packet
     {
         this.Values.push(value);
         return this.Values.length - 1;
+    }
+
+    GetValue(index)
+    {
+        if(this.Values.length <= index){ return null; }
+        return this.Values[index];
     }
 
     RemoveValue(index)
@@ -111,6 +118,11 @@ class Player extends IDObject
      */
     Color;
 
+    IsDrunk;
+    Exploded;
+    Indoctrinated;
+    IsDapper;
+
     constructor(id = "", lobby = "", position = { x: 0, y: 0 }, color = "#FF0000", packets = [])
     {
         super(id);
@@ -118,6 +130,11 @@ class Player extends IDObject
         this.Packets = packets;
         this.Position = position;
         this.Color = color;
+
+        this.IsDrunk = 0.0;
+        this.Exploded = 0.0;
+        this.IsDapper = false;
+        this.Indoctrinated = "";
     }
 
     /**
@@ -134,6 +151,8 @@ class Player extends IDObject
         this.Packets = json.Packets;
         this.Position = json.Position;
         this.Color = json.Color;
+        this.IsDrunk = json.IsDrunk;
+        this.Exploded = json.Exploded;
     }
 
     /**
@@ -166,6 +185,11 @@ class Player extends IDObject
         var obj = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
         delete obj["_ID"];
         delete obj["Lobby"];
+
+        //Client side info.
+        delete obj["Indoctrinated"];
+        delete obj["IsDapper"];
+
         return JSON.stringify(obj);
     }
 
@@ -179,4 +203,40 @@ class Player extends IDObject
         return this._ID;
     }
 
+}
+
+
+class InteractableElement
+{
+    Position;
+    ID;
+
+    constructor(position = {x: 0, y: 0}, ID = "")
+    {
+        this.Position = position;
+
+        if(ID == "")
+        {
+            ID = `interactable_${position.x}_${position.y}`;
+        }
+
+        this.ID = ID;
+    }
+
+    GetElement()
+    {
+        return document.getElementById(this.ID);
+    }
+
+    CreatePacket()
+    {
+        var packet = new Packet(PACKET_TYPES.PLAYER_INTERACTION, [ this.ID ]);
+        return packet;
+    }
+
+    PerformInteraction()
+    {
+        console.log("Interacted with " + this.ID);
+        return true;
+    }
 }

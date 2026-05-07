@@ -44,8 +44,17 @@ function ClearGame()
     }
 }
 
+var ServerDeltaTime = 0;
+var _currentServerTime = 0;
+
+//Used to ensure that packets are not handled more than one time.
+var PreviouslyHandledPacketTimes = []
 function UpdateGame()
 {
+    const now = Date.now().valueOf();
+    ServerDeltaTime = now - _currentServerTime;
+    _currentServerTime = now;
+
     //If no player, don't show anything.
     if(GetCurrentPlayer() == null){ClearGame(); return;}
 
@@ -55,18 +64,26 @@ function UpdateGame()
 
         for(var i = 0; i < packets.length; i++)
         {
-            const packet = packets[i];
+            const packetEvent = packets[i];
             //console.log(packet)
 
-            if(packet.Packet.Type == PACKET_TYPES.PLAYER_UPDATE)
+            if(packetEvent.Packet.Type == PACKET_TYPES.PLAYER_UPDATE)
             {
-                playerList.push(packet.Player.GetUsername());
+                playerList.push(packetEvent.Player.GetUsername());
+            }else{
+                //If the packet has been handled, don't do it again.
+                if(PreviouslyHandledPacketTimes.includes(packetEvent.Packet.Timestamp))
+                {
+                    continue;
+                }
+
+                PreviouslyHandledPacketTimes.push(packetEvent.Packet.Timestamp);
             }
 
-            HandlePacket(packet)
+            HandlePacket(packetEvent)
         }
 
-        document.getElementById("player_display").innerText = playerList.join(", ");
+        document.getElementById("player_display").innerText = "Characters: " + playerList.join(", ");
         
         //Find if any players have left and remove their display elements.
         for(var i = 0; i < Object.keys(PlayerElements).length; i++)
@@ -111,6 +128,28 @@ function HandlePacket(packetEvent)
         var playerElement = PlayerElements[packetEvent.Player.GetUsername()];
         if(playerElement == undefined || playerElement == null){ return; }
         playerElement.style.backgroundColor = packetEvent.Packet.Values[0];
+
+        return;
+    }
+
+    //Player interacted with an element.
+    if(packetEvent.Packet.Type == PACKET_TYPES.PLAYER_INTERACTION)
+    {
+        console.log("got INTERACT" + packetEvent.Packet.Timestamp)
+        const interactionID = packetEvent.Packet.Values[0];
+
+        //Find the interactable that was used based on the ID.
+        for(var i = 0; i < MapInteractables.length; i++)
+        {
+            if(MapInteractables[i].ID == interactionID)
+            {
+                //If found, perform interaction.
+                MapInteractables[i].PerformInteraction();
+                break;
+            }
+        }
+
+        return;
     }
 }
 
@@ -124,18 +163,21 @@ function CreatePlayerElement(player)
     var playerElement = document.createElement("div");
     playerElement.className = "player";
 
-    const usernameDisplay = document.createElement("p");
-    usernameDisplay.style.color = player.Color;
-    usernameDisplay.textContent = player.GetUsername();
+    const usernameDisplay = CreateNameBanner({x: 0, y: 0}, player.GetUsername(), player.Color);
     playerElement.appendChild(usernameDisplay);
 
     //Set the player color.
-    playerElement.style.backgroundColor = player.Color;
 
-    document.body.appendChild(playerElement);
+    ApplyElementBGColor(playerElement, player.Color + "33");
+
+    document.getElementById("object_holder").appendChild(playerElement);
 
     return playerElement;
 }
+
+
+var PlayerFootstepTimer = {}
+const PLAYER_FOOTSTEP_INTERVAL = 1
 
 /**
  * Updates the specified player element to match the parameters of the specificed player.
@@ -143,7 +185,7 @@ function CreatePlayerElement(player)
  * @param {Element} playerElement 
  * @returns 
  */
-function UpdatePlayerElement(player, playerElement)
+function UpdatePlayerElement(player, playerElement, isCurrentPlayer = false)
 {
     if(playerElement == null || playerElement == undefined){return;} 
     if(player == null || player == undefined){return;} 
@@ -152,8 +194,39 @@ function UpdatePlayerElement(player, playerElement)
 
     playerElement.style.bottom = player.Position.y + "px";
     playerElement.style.left = player.Position.x + "px";
-}
 
+    //If this is not the current player, 
+    if(!isCurrentPlayer)
+    {
+        const username = player.GetUsername();
+        if(PlayerFootstepTimer[username] == undefined){ PlayerFootstepTimer[username] = {timer:0, lastPos: { x: player.Position.x, y: player.Position.y }}; }
+
+        //Increment the footstep counter.
+        PlayerFootstepTimer[username].timer += ServerDeltaTime;
+
+        if(PlayerFootstepTimer[username].timer > PLAYER_FOOTSTEP_INTERVAL)
+        {
+            const previousPos = PlayerFootstepTimer[username].lastPos;
+            var angleBetween = Math.atan2(previousPos.y - player.Position.y, player.Position.x - previousPos.x);
+
+            if(Distance(previousPos, player.Position) < 1)
+            {
+                angleBetween = Math.random() * Math.PI * 2;
+            }
+
+            CreateFootstepParticle(player.Position, angleBetween);
+            PlayerFootstepTimer[username].timer = 0;
+            PlayerFootstepTimer[username].lastPos = player.Position;
+            
+        }
+    }else{
+        if(player.Exploded > 0.0)
+        {
+            player.Exploded -= DeltaTime;
+            playerElement.style.backgroundImage = `url('./assets/player_exploded.png')`;
+        }
+    }
+}
 
 
 //Page close.
